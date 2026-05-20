@@ -120,7 +120,7 @@ M.setup = function(opts)
     end,
   })
 
-  vim.api.nvim_create_autocmd({ 'VimResized', 'BufEnter' }, {
+  vim.api.nvim_create_autocmd({ 'WinResized', 'WinEnter' }, {
     group = scrollEOF_group,
     pattern = M.opts.pattern,
     callback = vim_resized_cb,
