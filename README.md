@@ -10,7 +10,12 @@ Getting started
 ---------------
 ### Install
 
-Using [lazy](https://github.com/folke/lazy.nvim)
+Using [pack](https://neovim.io/doc/user/pack/) (on Neovim 0.12 and newer):
+```lua
+vim.pack.add { 'https://github.com/Aasim-A/scrollEOF.nvim' }
+```
+
+Using [lazy](https://github.com/folke/lazy.nvim):
 ```lua
 {
   'Aasim-A/scrollEOF.nvim',
