@@ -3,6 +3,7 @@ local M = {}
 local mode_disabled = false
 local initial_scrolloff = vim.o.scrolloff
 local scrolloff = vim.o.scrolloff
+local relative_scrolloff = 0
 
 local function is_disabled()
   return mode_disabled or M.opts.disabled_filetypes[vim.o.filetype] == true
@@ -47,6 +48,7 @@ local default_opts = {
   floating = true,
   disabled_filetypes = { 'terminal' },
   disabled_modes = { 't', 'nt' },
+  relative_scrolloff = 0,
 }
 
 local vim_resized_cb = function()
@@ -55,6 +57,12 @@ local vim_resized_cb = function()
   end
 
   local win_height = vim.fn.winheight(0)
+  if relative_scrolloff > 1 then
+    scrolloff = math.floor(win_height / relative_scrolloff)
+    vim.o.scrolloff = scrolloff
+    return -- use relative if set (legally) and ignore scrolloff
+  end
+
   local half_win_height = math.floor(win_height / 2)
 
   if initial_scrolloff < half_win_height then
@@ -99,6 +107,8 @@ M.setup = function(opts)
   if M.opts.insert_mode then
     table.insert(autocmds, 'CursorMovedI')
   end
+
+  relative_scrolloff = M.opts.relative_scrolloff
 
   local scrollEOF_group = vim.api.nvim_create_augroup('ScrollEOF', { clear = true })
 
