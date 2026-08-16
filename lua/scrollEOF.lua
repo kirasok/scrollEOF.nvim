@@ -21,7 +21,7 @@ local function check_eof_scrolloff(ev)
   end
 
   local win_id = vim.api.nvim_get_current_win()
-  if ev.event == 'WinScrolled' then
+  if ev ~= nil and ev.event == 'WinScrolled' then
     local win_event = vim.v.event[tostring(win_id)]
     if win_event ~= nil and win_event.topline <= 0 then
       return
@@ -129,8 +129,8 @@ M.setup = function(opts)
     callback = check_eof_scrolloff,
   })
 
-  vim_resized_cb()
-  vim.defer_fn(vim_resized_cb, 0)
+  check_eof_scrolloff(nil)
+  vim.schedule(check_eof_scrolloff)
 end
 
 return M
