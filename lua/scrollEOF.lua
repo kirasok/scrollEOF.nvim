@@ -2,7 +2,6 @@ local M = {}
 
 local mode_disabled = false
 local initial_scrolloff = vim.o.scrolloff
-local scrolloff = vim.o.scrolloff
 local relative_scrolloff = 0
 
 local function is_disabled()
@@ -21,8 +20,8 @@ local function check_eof_scrolloff(ev)
     end
   end
 
+  local win_id = vim.api.nvim_get_current_win()
   if ev.event == 'WinScrolled' then
-    local win_id = vim.api.nvim_get_current_win()
     local win_event = vim.v.event[tostring(win_id)]
     if win_event ~= nil and win_event.topline <= 0 then
       return
@@ -33,6 +32,7 @@ local function check_eof_scrolloff(ev)
   local win_cur_line = vim.fn.winline()
   local visual_distance_to_eof = win_height - win_cur_line
 
+  local scrolloff = vim.wo[win_id].scrolloff
   if visual_distance_to_eof < scrolloff then
     local win_view = vim.fn.winsaveview()
     vim.fn.winrestview({
@@ -58,8 +58,7 @@ local vim_resized_cb = function()
 
   local win_height = vim.fn.winheight(0)
   if relative_scrolloff > 1 then
-    scrolloff = math.floor(win_height / relative_scrolloff)
-    vim.o.scrolloff = scrolloff
+    vim.wo.scrolloff = math.floor(win_height / relative_scrolloff)
     return -- use relative if set (legally) and ignore scrolloff
   end
 
@@ -68,14 +67,12 @@ local vim_resized_cb = function()
   if initial_scrolloff < half_win_height then
     if vim.o.scrolloff < initial_scrolloff then
       vim.o.scrolloff = initial_scrolloff
-      scrolloff = initial_scrolloff
     end
 
     return
   end
 
-  scrolloff = half_win_height
-  vim.o.scrolloff = (win_height % 2 == 0 and scrolloff > 0) and scrolloff - 1 or scrolloff
+  vim.o.scrolloff = (win_height % 2 == 0 and half_win_height > 0) and half_win_height - 1 or half_win_height
 end
 
 M.setup = function(opts)
