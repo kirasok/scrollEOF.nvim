@@ -51,28 +51,37 @@ local default_opts = {
   relative_scrolloff = 0,
 }
 
-local function vim_resized_cb()
+local function vim_resized_cb(ev)
   if is_disabled() then
     return
   end
 
-  local win_height = vim.fn.winheight(0)
-  if relative_scrolloff > 1 then
-    vim.wo.scrolloff = math.floor(win_height / relative_scrolloff)
-    return -- use relative if set (legally) and ignore scrolloff
+  ---@type integer[]
+  local win_ids = {}
+  if ev.event == "WinResized" then
+    win_ids = vim.v.event.windows or {}
+  else
+    table.insert(win_ids, vim.api.nvim_get_current_win())
   end
 
-  local half_win_height = math.floor(win_height / 2)
-
-  if initial_scrolloff < half_win_height then
-    if vim.o.scrolloff < initial_scrolloff then
-      vim.o.scrolloff = initial_scrolloff
+  for _, id in ipairs(win_ids) do
+    local win_height = vim.fn.winheight(id)
+    if relative_scrolloff > 1 then
+      vim.wo[id].scrolloff = math.floor(win_height / relative_scrolloff)
+      goto continue
     end
 
-    return
-  end
+    local half_win_height = math.floor(win_height / 2)
+    if initial_scrolloff < half_win_height then
+      if vim.wo[id].scrolloff < initial_scrolloff then
+        vim.wo[id].scrolloff = initial_scrolloff
+      end
+      goto continue
+    end
 
-  vim.o.scrolloff = (win_height % 2 == 0 and half_win_height > 0) and half_win_height - 1 or half_win_height
+    vim.wo[id].scrolloff = (win_height % 2 == 0 and half_win_height > 0) and half_win_height - 1 or half_win_height
+    ::continue::
+  end
 end
 
 function M.setup(opts)
