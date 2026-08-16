@@ -1,7 +1,6 @@
 local M = {}
 
 local mode_disabled = false
-local initial_scrolloff = vim.o.scrolloff
 local relative_scrolloff = 0
 
 local function is_disabled()
@@ -31,8 +30,9 @@ local function check_eof_scrolloff(ev)
   local win_height = vim.fn.winheight(0)
   local win_cur_line = vim.fn.winline()
   local visual_distance_to_eof = win_height - win_cur_line
-
+  --- FIXME: when global scrolloff is much higher than winheight, window-local scrolloff somehow sets to -1
   local scrolloff = vim.wo[win_id].scrolloff
+
   if visual_distance_to_eof < scrolloff then
     local win_view = vim.fn.winsaveview()
     vim.fn.winrestview({
@@ -72,10 +72,8 @@ local function vim_resized_cb(ev)
     end
 
     local half_win_height = math.floor(win_height / 2)
-    if initial_scrolloff < half_win_height then
-      if vim.wo[id].scrolloff < initial_scrolloff then
-        vim.wo[id].scrolloff = initial_scrolloff
-      end
+    if vim.o.scrolloff < half_win_height then
+      vim.wo[id].scrolloff = vim.o.scrolloff
       goto continue
     end
 
