@@ -100,7 +100,7 @@ M.setup = function(opts)
   end
   M.opts.disabled_modes = disabled_modes_hashmap
 
-  local autocmds = { 'CursorMoved', 'WinScrolled' }
+  local autocmds = { 'CursorMoved', 'WinScrolled', "WinNew", }
   if M.opts.insert_mode then
     table.insert(autocmds, 'CursorMovedI')
   end
