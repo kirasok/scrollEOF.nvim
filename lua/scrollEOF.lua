@@ -58,7 +58,7 @@ local function vim_resized_cb(ev)
 
   ---@type integer[]
   local win_ids = {}
-  if ev.event == "WinResized" then
+  if ev ~= nil and ev.event == "WinResized" then
     win_ids = vim.v.event.windows or {}
   else
     table.insert(win_ids, vim.api.nvim_get_current_win())
@@ -138,8 +138,12 @@ function M.setup(opts)
     callback = check_eof_scrolloff,
   })
 
+  vim_resized_cb()
   check_eof_scrolloff(nil)
-  vim.schedule(check_eof_scrolloff)
+  vim.schedule(function()
+    vim_resized_cb()
+    check_eof_scrolloff()
+  end)
 end
 
 return M
