@@ -51,7 +51,7 @@ local default_opts = {
   relative_scrolloff = 0,
 }
 
-local vim_resized_cb = function()
+local function vim_resized_cb()
   if is_disabled() then
     return
   end
@@ -75,7 +75,7 @@ local vim_resized_cb = function()
   vim.o.scrolloff = (win_height % 2 == 0 and half_win_height > 0) and half_win_height - 1 or half_win_height
 end
 
-M.setup = function(opts)
+function M.setup(opts)
   if opts == nil then
     opts = default_opts
   else
