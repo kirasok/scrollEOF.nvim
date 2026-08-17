@@ -30,7 +30,7 @@ local function check_eof_scrolloff(ev)
   local win_height = vim.fn.winheight(0)
   local win_cur_line = vim.fn.winline()
   local visual_distance_to_eof = win_height - win_cur_line
-  --- FIXME: when global scrolloff is much higher than winheight, window-local scrolloff somehow sets to -1
+  --- FIXME: when global scrolloff is set after Neovim startup to be much higher than winheight, window-local scrolloff somehow sets to -1
   local scrolloff = vim.wo[win_id].scrolloff
 
   if visual_distance_to_eof < scrolloff then
